@@ -1,0 +1,182 @@
+# API for originstamp.org for storing arbitrary data into the Bitcoin blockchain.
+swagger: '2.0'
+info:
+  title: originstamp.org API
+  description: Trusted Timestamp via Bitcoin blockchain
+  version: "1.0.0"
+# the domain of the service
+host: localhost
+# array of all schemes
+schemes:
+  - http
+# will be prefixed to all paths
+basePath: /api
+produces:
+  - application/json
+paths:
+  /stamps:
+    post:
+      summary: Create Timestamp
+      description: |
+        Create a Trusted Timestamp using the Bitcoin blockchain. You need to provide a 40 Bytes value or shorter to be stored. Empty inputs ar rejected.
+      parameters:
+        - name: data
+          in: body
+          schema:
+            type: string
+          description: 40 Bytes value for timestamping.
+          required: true
+        - name: api_key
+          in: header
+          description: The API key you were provided.
+          required: true
+          type: string
+        - name: sender
+          in: header
+          description: E-Mail address of the sender.
+          required: false
+          type: string
+          format: email
+        - name: send_back
+          in: header
+          description: Send back data.
+          required: false
+          type: boolean
+        - name: title
+          in: header
+          description: An optional title for data. Will be public.
+          required: false
+          type: string
+      responses:
+        200:
+          description: Data transmission was succesful.
+          schema:
+            $ref: '#/definitions/Success'
+        default:
+          description: Unexpected error occured.
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Return Timestamps.
+      description: |
+        Return a collection of timestamps. By combining the listed fields beneath its possible to search for more timestamps.
+      parameters:
+        - name: api_key
+          in: header
+          description: Return timestamp with given key.
+          required: true
+          type: string
+        - name: date_time
+          in: header
+          description: Return timestamps with certain date.
+          required: false
+          type: string
+          format: date-time
+        - name: sender
+          in: header
+          description: E-Mail of the sender.
+          required: false
+          type: string
+          format: email
+        - name: restricted
+          in: header
+          description: Returns stamps only created by the provided API key.
+          required: false
+          type: boolean
+      responses:
+        200:
+          description: Data transmission was succesful.
+          schema:
+            $ref: '#/definitions/Success'
+        default:
+          description: Unexpected error occured.
+          schema:
+            $ref: '#/definitions/Error'
+  /stamps/{sha_256}:
+    get:
+      summary: Return Timestamp
+      description: |
+        Returns a specific Timestamp.
+      parameters:
+        - name: sha_256
+          in: path
+          description: The sha_256 value of the entry you want to retrieve from the blockchain.
+          required: true
+          type: string
+      responses:
+        200:
+          description: Data transmission was succesful.
+          schema:
+            $ref: '#/definitions/Success'
+        default:
+          description: Unexpected error occured.
+          schema:
+            $ref: '#/definitions/Error'
+  /transactions:
+    get:
+      summary: Transaction Records.
+      description: |
+        Get multiple transaction records from the blockchain.
+      parameters:
+        - name: api_key
+          in: header
+          description: Return timestamp with given key.
+          required: true
+          type: string
+        - name: date_time
+          in: header
+          description: Return timestamps with certain date.
+          required: false
+          type: string
+          format: date-time
+      responses:
+        200:
+          description: Data transmission was succesful.
+          schema:
+            $ref: '#/definitions/Success'
+        default:
+          description: Unexpected error occured.
+          schema:
+            $ref: '#/definitions/Error'
+  /transactions/{tx_hash}:
+    get:
+      summary: Get single transaction record.
+      description: |
+        Get single transaction record from the blockchain providing the transaction hash.
+      parameters:
+        - name: tx_hash
+          in: path
+          description: Return transaction with given sha_256.
+          required: true
+          type: string
+      responses:
+        200:
+          description: Data transmission was succesful.
+          schema:
+            $ref: '#/definitions/Success'
+        default:
+          description: Unexpected error occured.
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  Success:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
+
