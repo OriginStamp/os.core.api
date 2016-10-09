@@ -19,6 +19,7 @@ paths:
       summary: Create Timestamp
       description: |
         Create a Trusted Timestamp using the Bitcoin blockchain. You need to provide a 40 Bytes value or shorter to be stored. Empty inputs ar rejected.
+      operationId: stampsCreate
       parameters:
         - name: data
           in: body
@@ -59,7 +60,8 @@ paths:
     get:
       summary: Return Timestamps.
       description: |
-        Return a collection of timestamps. By combining the listed fields beneath its possible to search for more timestamps.
+        Return a collection of timestamps. By combining the listed parameters it's possible to search for more timestamps.
+      operationId: stampsGet
       parameters:
         - name: api_key
           in: header
@@ -97,6 +99,7 @@ paths:
       summary: Return Timestamp
       description: |
         Returns a specific Timestamp.
+      operationId: stampsGetBySHA256
       parameters:
         - name: sha_256
           in: path
@@ -117,6 +120,7 @@ paths:
       summary: Transaction Records.
       description: |
         Get multiple transaction records from the blockchain.
+      operationId: transactionsGet
       parameters:
         - name: api_key
           in: header
@@ -143,6 +147,7 @@ paths:
       summary: Get single transaction record.
       description: |
         Get single transaction record from the blockchain providing the transaction hash.
+      operationId: transactionsGetByTxHash
       parameters:
         - name: tx_hash
           in: path
@@ -159,6 +164,134 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 definitions:
+  Stamp:
+    type: object
+    properties:
+      hash_sha256:
+        description: The SHA256 hash of the timestamped data.
+        type: string
+      sender_id:
+        $ref: "#/definitions/User"
+      created_at:
+        description: Local server time the timestamp was created (not equal to Blockchain validation time).
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time
+      submitted_at:
+        description: Time the stamp has been submitted to the blockchain.
+        type: string
+        format: date-time
+      blockchain_transaction_id:
+        $ref: "#/definitions/BlockchainTransaction"
+      title:
+        type: string
+      api_key_id:
+        $ref: "#/definitions/APIKey"
+      #tweet_id:
+      #  type: string
+      #  description:
+  APIKey:
+    type: object
+    properties:
+      access_token:
+        type: string
+      name:
+        type: string
+      expires_at:
+        type: string
+        format: date-time
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time
+      used:
+        type: integer
+        format: int32
+  BlockchainTransaction:
+    type: object
+    properties:
+      tx_hash:
+        description: The transaction id in the Blockchain.
+        type: string
+      recipient:
+        description: The recipient address of the transaction.
+        type: string
+      status:
+        description: The transaction status (0 = unconfirmed, 1 = confirmed)
+        type: integer
+        format: int32
+      created_at:
+        description: The time the transaction has been created (can be different to Blockchain data).
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time
+      wallet_id:
+        $ref: "#/definitions/Wallet"
+      private_key:
+        type: string
+      public_key:
+        type: string
+      seed:
+        type: string
+  Url:
+    type: object
+    properties:
+      token:
+        type: string
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time
+      stamp_id:
+        $ref: "#/definitions/Stamp"
+  User:
+    type: object
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time
+  Wallet:
+    type: object
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time
+  WhitelistEmail:
+    type: object
+    properties:
+      email:
+        type: string
+      access_token:
+        type: string
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time
+      confirmed:
+        type: integer
+        format: int32
   Success:
     type: object
     properties:
@@ -179,4 +312,3 @@ definitions:
         type: string
       fields:
         type: string
-
